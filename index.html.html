@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JSON Formatter & Tree Viewer</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#131d31;--line:#2b3a52;--text:#dce6f4;--muted:#94a8c1;--accent:#62b7ff;--str:#8ce7b4;--num:#f6bb78;--key:#9bcaff;--bool:#d6a7ff;--error:#ffa2aa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.55 system-ui,Arial,sans-serif}button,input,textarea{font:inherit}button,.file-label{background:#1d2a42;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--text);cursor:pointer;white-space:nowrap}button:hover,.file-label:hover{background:#283c56;border-color:var(--accent)}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#1764ad;border-color:#2678c6;color:white}input[type=file]{display:none}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent)}header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}h1{font-size:19px;line-height:1.3;margin:0}header p{font-size:12px;color:var(--muted);margin:3px 0 0}.actions,.tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.main{height:calc(100vh - 100px);min-height:420px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:12px;gap:12px}.pane{display:flex;flex-direction:column;min-width:0;min-height:0;border:1px solid var(--line);background:var(--panel);border-radius:11px;overflow:hidden}.pane-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 13px;border-bottom:1px solid var(--line);font-weight:650}.pane-head button{padding:5px 8px;font-size:12px}.info{color:var(--muted);font-size:11px;font-weight:400}.input-area{flex:1;min-height:0;position:relative}textarea{height:100%;width:100%;resize:none;background:transparent;border:0;outline:none;color:var(--text);padding:14px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;tab-size:2}textarea:read-only{color:#a9bacd}.large-banner{position:absolute;inset:auto 12px 14px 12px;background:#1b344e;border:1px solid #42749b;border-radius:8px;padding:10px;color:#c6e3ff;font-size:12px;display:none}.status{padding:7px 13px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);min-height:33px}.status.error{color:var(--error)}.searchbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--line)}.searchbar input{background:#0d1829;color:var(--text);border:1px solid #344862;border-radius:7px;min-width:150px;flex:1;padding:8px 9px;outline:none;font:13px ui-monospace,monospace}.searchbar input:focus{border-color:var(--accent)}.searchbar button{padding:6px 9px}.searchbar .info{white-space:nowrap}.hint{width:100%;font-size:11px;color:var(--muted)}.tree-scroll{overflow:auto;flex:1;padding:12px 10px 40px 13px;white-space:nowrap;font:13px/1.85 ui-monospace,Menlo,Consolas,monospace}.tree-line{display:flex;align-items:baseline;min-height:23px;width:max-content;min-width:100%;padding:0 15px 0 0}.tree-line:hover{background:#1d2d44}.tree-line.active{background:#254465;box-shadow:inset 3px 0 var(--accent)}.tree-children{margin-left:21px;border-left:1px solid #2b3a52}.arrow{border:0;background:transparent;color:var(--muted);width:21px;min-width:21px;height:21px;padding:0;text-align:center;font:13px ui-monospace,monospace}.arrow:hover{background:#31445d}.spacer{display:inline-block;width:21px;min-width:21px}.key{color:var(--key)}.string{color:var(--str)}.number{color:var(--num)}.boolean,.null{color:var(--bool)}.punct{color:#c5cfdd}.count{font:11px system-ui;color:#b3c4d7;background:#263850;border:1px solid #36506d;border-radius:999px;padding:1px 7px;margin-left:8px}.fold{color:var(--muted);margin-left:7px}.empty{padding:13px;color:var(--muted)}.more{margin:6px 0 8px 20px;font-size:12px;color:#add7ff}.modal{position:fixed;inset:0;z-index:20;background:#020711d6;display:flex;align-items:center;justify-content:center;padding:15px}.modal[hidden]{display:none}.modal-card{width:min(1550px,99vw);height:min(890px,96vh);background:var(--panel);border:1px solid #45617d;border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden}.modal-head{padding:13px 17px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--line)}.modal-head h2{margin:0;font-size:19px}.modal-content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(190px,270px) minmax(0,1fr)}.sidebar{overflow:auto;border-right:1px solid var(--line);padding:10px 5px}.nav-row{display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:6px;min-height:31px;cursor:pointer}.nav-row:hover{background:#21344e}.nav-row.selected{background:#274a6c;color:white}.nav-row .nav-open{padding:1px 4px;min-width:20px;border:0;background:none;font-size:12px}.nav-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.nav-count{font-size:10px;color:var(--muted);white-space:nowrap}.nav-kids{margin-left:12px;padding-left:7px;border-left:1px solid #34516b}.tab-main{min-width:0;min-height:0;display:flex;flex-direction:column}.table-title{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;overflow-wrap:anywhere}.table-title strong{font-size:15px}.table-title small{display:block;color:var(--muted);margin-top:3px}.table-wrap{overflow:auto;flex:1;padding:12px}.json-table{border-collapse:collapse;min-width:100%;text-align:left;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace}.json-table th,.json-table td{border:1px solid #304158;padding:8px 10px;max-width:360px;overflow-wrap:anywhere;vertical-align:top}.json-table th{position:sticky;top:0;background:#20334e;color:#b9d9fc;font:600 12px system-ui;z-index:1}.json-table tr:nth-child(even) td{background:#17243a}.json-table tr:hover td{background:#27374c}.json-table tr.focus td{background:#294969}.cell-link{color:#8fceff;cursor:pointer;text-decoration:underline;text-decoration-style:dotted}.table-footer{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--line)}.table-footer input{width:90px;background:#0d1829;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px}.match-list{max-height:110px;overflow:auto;border-top:1px solid var(--line);display:none}.match-item{display:block;width:100%;text-align:left;border:0;border-radius:0;background:#17243a;overflow:hidden;text-overflow:ellipsis;font:12px ui-monospace,monospace}.match-item.current{background:#254465}.notice{color:var(--muted);font-size:12px}.loading{color:#a0d3ff}.tag{color:#bde3ff;font-size:11px;border:1px solid #365477;padding:2px 6px;border-radius:5px}@media(max-width:800px){.main{height:auto;grid-template-columns:1fr}.pane{height:55vh;min-height:360px}.modal-content{grid-template-columns:minmax(125px,30%) minmax(0,1fr)}header{padding:12px}}
+
+/* Restored stacked hierarchical table cards (independent of main JSON tree). */
+.accordion-content{overflow:auto;flex:1;min-height:0;padding:16px 22px 34px}.section-card{border:1px solid #344b67;border-radius:12px;background:#18263d;margin:10px 0 14px;overflow:hidden}.section-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;min-height:56px;background:#1c2d46}.section-header:hover{background:#263b57}.section-arrow{border:0;background:none;color:var(--accent);font-size:15px;padding:3px;width:23px;cursor:pointer}.section-label{font-size:16px;font-weight:700;color:#dbe8fa;overflow-wrap:anywhere}.section-path{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.section-count{margin-left:auto;white-space:nowrap;font-size:11px;color:#a8c4dd}.section-body{padding:0 15px 15px}.section-children{margin:12px 0 2px 20px;padding-left:14px;border-left:2px solid #314d6b}.section-table-wrap{overflow:auto;max-height:420px;border-radius:8px}.section-pagination{padding:9px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.section-pagination button{font-size:11px;padding:4px 9px}.section-highlight>.section-header{background:#2a4a6e}.section-card .json-table{width:100%}.section-empty{color:var(--muted);font-size:12px;padding:10px 0}.section-card .json-table th{top:0}@media(max-width:800px){.accordion-content{padding:10px}.section-children{margin-left:7px;padding-left:7px}.section-header{gap:6px;padding:10px}.section-path{font-size:10px}}
+</style></head><body>
+<header><div><h1>JSON Formatter & Tree Viewer</h1><p>Side-by-side editor • 100% Ad-Free</p></div><div class="actions"><button class="primary" id="format">Format JSON</button><button id="minify">Minify Input</button><label class="file-label" for="upload">Open File</label><input id="upload" type="file" accept=".json,.txt,application/json,text/plain"><button id="clear">Clear</button></div></header>
+<main class="main"><section class="pane"><div class="pane-head"><span>INPUT JSON</span><div class="tools"><span class="info" id="input-size"></span><button id="sample">Example</button><button id="paste">Paste</button></div></div><div class="input-area"><textarea id="input" spellcheck="false" placeholder="Paste JSON here, or select Open File…"></textarea><div class="large-banner" id="large-banner"></div></div><div class="status" id="input-status">Paste JSON or open a file, then select Format JSON (⌘/Ctrl + Enter).</div></section>
+<section class="pane"><div class="pane-head"><span>FORMATTED JSON <span class="info" id="total-count"></span></span><div class="tools"><button id="expand">Expand Visible</button><button id="collapse">Collapse All</button><button id="copy">Copy JSON</button><button id="download">Download</button><button id="table-view" class="primary" disabled>▦ Table View</button></div></div><div class="searchbar"><input id="search" type="search" placeholder="Search keys, values, or paths…" aria-label="Search JSON"><span class="info" id="match-count">0 matches</span><button id="prev">↑ Prev</button><button id="next">↓ Next</button><button id="clear-search">✕</button><span class="hint">Search all levels in the background • Enter / Shift+Enter to navigate • Results capped at 1,000 (search stops at 1,000 matches)</span></div><div class="tree-scroll" id="tree"><div class="empty">Formatted JSON appears here.</div></div><div class="status" id="output-status">Objects: 0 · Arrays: 0</div></section></main>
+<div class="modal" id="table-modal" hidden role="dialog" aria-modal="true" aria-labelledby="table-heading"><div class="modal-card"><div class="modal-head"><div><h2 id="table-heading">Table View</h2><div class="info">Hierarchical sections • paginated data • search keys, values and paths</div></div><div class="tools"><button id="table-close">✕ Close</button></div></div><div class="searchbar"><input id="table-search" type="search" placeholder="Search all tables: keys, values, paths…"><span class="info" id="table-match-count">0 matches</span><button id="table-prev">↑ Prev</button><button id="table-next">↓ Next</button><button id="table-clear">✕</button><span class="hint">Search keeps the hierarchy • matches open their containing table • Enter / Shift+Enter navigates</span></div><div class="accordion-content" id="table-nav" aria-label="Hierarchical JSON table sections"></div><div class="match-list" id="table-matches"></div></div></div></div></div>
+<script id="worker-code" type="text/plain">
+'use strict';
+let root=null, hasRoot=false, source='', searchToken=0;
+const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+const complex=v=>v!==null&&typeof v==='object';
+const typ=v=>Array.isArray(v)?'array':v===null?'null':typeof v;
+const pathstr=p=>'$'+p.map(k=>typeof k==='number'?'['+k+']':/^[a-zA-Z_$][\w$]*$/.test(k)?'.'+k:'['+JSON.stringify(k)+']').join('');
+function at(p){let v=root;for(const k of p){if(!complex(v)||!own(v,k))throw Error('Path no longer exists');v=v[k]}return v}
+function info(v){return {type:typ(v),count:Array.isArray(v)?v.length:complex(v)?Object.keys(v).length:0,value:complex(v)?null:v}}
+function brief(v){if(complex(v))return Array.isArray(v)?`Array (${v.length} items)`:`Object (${Object.keys(v).length} keys)`;if(typeof v==='string')return v.length>240?v.slice(0,240)+'…':v;return v===null?'null':String(v)}
+function entryList(v,offset,limit){if(!complex(v))return [];const arr=Array.isArray(v);const keys=arr?null:Object.keys(v);const length=arr?v.length:keys.length;const end=Math.min(length,offset+limit);const out=[];for(let i=offset;i<end;i++){const key=arr?i:keys[i],child=v[key];out.push({key,...info(child),preview:brief(child)})}return out}
+function post(type,id,data){self.postMessage({type,id,...data})}
+async function processInput(id,input,asFile){try{root=null;hasRoot=false;searchToken++;source=asFile?await input.text():input;const data=JSON.parse(source);root=data;hasRoot=true;post('loaded',id,{info:info(root),bytes:new Blob([source]).size});source='';}catch(e){root=null;hasRoot=false;source='';post('failure',id,{error:String(e.message||e)})}}
+let currentSearch=0;
+async function scan(id,query){
+ const token=++searchToken;currentSearch=id;
+ const q=query.trim().toLowerCase();
+ if(!q||!hasRoot){post('searchDone',id,{matches:[],scanned:0,limited:false});return}
+ const matches=[];let scanned=0;
+ // Depth-first traversal with one stack frame per nesting level, not one per record.
+ // This avoids allocating a million-entry work queue for million-element arrays.
+ const frames=[{v:root,p:[],idx:0,keys:null,entered:false}];
+ while(frames.length&&matches.length<1000){
+  if(token!==searchToken)return;
+  let iterations=0;
+  while(frames.length&&iterations++<3500&&matches.length<1000){
+   const f=frames[frames.length-1];
+   if(!f.entered){
+    f.entered=true;scanned++;
+    if(!complex(f.v)){
+     const label=pathstr(f.p),value=brief(f.v);
+     if((label+' '+value).toLowerCase().includes(q))matches.push({path:f.p,preview:value.slice(0,135),display:label});
+     frames.pop();continue;
+    }
+    if(!Array.isArray(f.v))f.keys=Object.keys(f.v);
+   }
+   const length=f.keys?f.keys.length:f.v.length;
+   if(f.idx>=length){frames.pop();continue}
+   const k=f.keys?f.keys[f.idx]:f.idx;
+   f.idx++;
+   frames.push({v:f.v[k],p:f.p.concat(k),idx:0,keys:null,entered:false});
+  }
+  if(scanned%28000<3500)post('searchProgress',id,{scanned,matches:matches.length});
+  if(frames.length)await new Promise(resolve=>setTimeout(resolve,0));
+ }
+ if(token!==searchToken)return;
+ post('searchDone',id,{matches,scanned,limited:frames.length>0});
+}
+function tablePage(v,offset,size){const array=Array.isArray(v);const isObj=complex(v)&&!array;const count=array?v.length:isObj?Object.keys(v).length:1;const end=Math.min(count,offset+size);let cols=[];const rows=[];
+if(array){const keys=new Set();let objectRows=0;for(let i=offset;i<end;i++){const r=v[i];if(r&&typeof r==='object'&&!Array.isArray(r)){objectRows++;for(const k of Object.keys(r)){keys.add(k);if(keys.size>=100)break}}}if(objectRows>0){cols=['#',...keys];for(let i=offset;i<end;i++){const r=v[i];rows.push({index:i,cells:[i+1,...cols.slice(1).map(k=>r&&typeof r==='object'&&!Array.isArray(r)&&own(r,k)?brief(r[k]):'')],complexFields:cols.slice(1).filter(k=>r&&complex(r[k])).map(k=>({key:k,preview:brief(r[k])})),isComplex:complex(r),nonObject:!r||typeof r!=='object'||Array.isArray(r)})}}else{cols=['#','Value'];for(let i=offset;i<end;i++)rows.push({index:i,cells:[i+1,brief(v[i])],isComplex:complex(v[i])})}}
+else if(isObj){cols=['Property','Value'];const keys=Object.keys(v);for(let i=offset;i<end;i++){const k=keys[i];rows.push({index:i,key:k,cells:[k,brief(v[k])],isComplex:complex(v[k])})}}
+else{cols=['Value'];rows.push({index:0,cells:[brief(v)],isComplex:false})}
+return {cols,rows,count,offset}}
+self.onmessage=async e=>{const {op,id}=e.data;try{if(op==='loadText'||op==='loadFile')return await processInput(id,e.data.data,op==='loadFile');if(op==='cancelSearch'){searchToken++;return}if(op==='search')return await scan(id,e.data.query);if(!hasRoot)throw Error('Load valid JSON first');if(op==='node')return post('node',id,{path:e.data.path,info:info(at(e.data.path))});if(op==='children')return post('children',id,{path:e.data.path,offset:e.data.offset,entries:entryList(at(e.data.path),e.data.offset,e.data.limit)});if(op==='tablePage')return post('tablePage',id,{path:e.data.path,page:tablePage(at(e.data.path),e.data.offset,e.data.size)});if(op==='sections'){
+ const v=at(e.data.path);const sections=[];
+ // Array records stay in a single table; do not generate hundreds of peer sections.
+ // Nested complex fields can be opened from individual cells.
+ if(complex(v)&&!Array.isArray(v)){
+  const offset=e.data.offset||0;
+  const entries=entryList(v,offset,80);
+  for(const en of entries)if(en.type==='array'||en.type==='object')sections.push(en);
+  return post('sections',id,{path:e.data.path,sections,nextOffset:offset+entries.length,total:Object.keys(v).length});
+ }
+ return post('sections',id,{path:e.data.path,sections,nextOffset:0,total:0});
+}if(op==='export'){const val=at([]);const data=JSON.stringify(val,null,e.data.minify?0:2);return post('export',id,{data,action:e.data.action})}if(op==='stats'){let objects=0,arrays=0,values=0;const stack=[root];while(stack.length){const v=stack.pop();if(Array.isArray(v)){arrays++;for(const x of v)stack.push(x)}else if(complex(v)){objects++;for(const x of Object.values(v))stack.push(x)}else values++}return post('stats',id,{objects,arrays,values})}}
+catch(err){post('failure',id,{error:String(err.message||err),op})}};
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), input=$('input'),tree=$('tree'), workerSrc=$('worker-code').textContent;
+const worker=new Worker(URL.createObjectURL(new Blob([workerSrc],{type:'text/javascript'})));
+let requestNo=0,pending=new Map(),ready=false,loadFile=null,bytes=0,rootInfo=null,treeNodes=new Map(),searchResults=[],activeHit=-1,tableMode=false,activeSection=[],tableOffset=0,tableCount=0,tableRows=[],searchTimer=0,searchSequence=0,searchMode='tree';
+const CHUNK=80,TABLE_PAGE=100,LARGE_INPUT=2*1024*1024;
+const pathKey=p=>JSON.stringify(p),isComplex=t=>t==='object'||t==='array',human=n=>Number(n).toLocaleString(),sz=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
+function setStatus(id,msg,error=false){$(id).textContent=msg;$(id).classList.toggle('error',error)}
+function send(op,args={}){const id=++requestNo;const promise=new Promise((resolve,reject)=>pending.set(id,{resolve,reject}));worker.postMessage({op,id,...args});return promise}
+worker.onmessage=event=>{const m=event.data;if(m.type==='searchProgress'){if(m.id===searchSequence)$(searchMode==='table'?'table-match-count':'match-count').textContent=`Scanning… ${human(m.scanned)} nodes · ${human(m.matches)} matches`;return}const p=pending.get(m.id);if(!p)return;if(m.type==='failure'){pending.delete(m.id);p.reject(new Error(m.error));return}if(['loaded','node','children','tablePage','sections','export','stats','searchDone'].includes(m.type)){pending.delete(m.id);p.resolve(m)}};
+worker.onerror=e=>{setStatus('input-status','Processing worker error: '+e.message,true)};
+function reset(clearInput=false){ready=false;rootInfo=null;treeNodes.clear();searchResults=[];activeHit=-1;$('table-view').disabled=true;tree.replaceChildren(Object.assign(document.createElement('div'),{className:'empty',textContent:'Formatted JSON appears here.'}));$('total-count').textContent='';$('output-status').textContent='Objects: — · Arrays: —';$('match-count').textContent='0 matches';if(clearInput){input.value='';input.readOnly=false;loadFile=null;bytes=0;$('large-banner').style.display='none';$('input-size').textContent='';setStatus('input-status','Paste JSON or open a file, then select Format JSON.')}}
+input.addEventListener('input',()=>{if(ready)reset();loadFile=null;$('input-size').textContent=sz(new Blob([input.value]).size)});
+$('upload').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;reset();loadFile=file;bytes=file.size;$('input-size').textContent=sz(bytes);if(bytes>LARGE_INPUT){input.value='';input.readOnly=true;const b=$('large-banner');b.style.display='block';b.textContent=`${file.name} (${sz(bytes)}) selected. Large files are processed in a background worker without inserting their full text into the editor.`;}else{input.readOnly=false;$('large-banner').style.display='none';input.value=await file.text()}setStatus('input-status',`File selected: ${file.name}. Click Format JSON.`);e.target.value=''});
+async function format(){if(!loadFile&&!input.value.trim()){setStatus('input-status','Enter JSON or select a file first.',true);return}reset();const button=$('format');button.disabled=true;button.textContent='Processing…';setStatus('input-status','Parsing JSON in the background…');try{const result=await send(loadFile?'loadFile':'loadText',{data:loadFile||input.value});ready=true;rootInfo=result.info;bytes=result.bytes;$('input-size').textContent=sz(bytes);$('table-view').disabled=false;await initTree();setStatus('input-status','✓ Valid JSON · '+sz(bytes)+' · expand sections on demand.');$('output-status').textContent=`Ready · ${human(rootInfo.count)} root entries · lazy tree rendering`;send('stats').then(r=>{$('total-count').textContent=`(${human(r.objects)} objects, ${human(r.arrays)} arrays)`;$('output-status').textContent=`Objects: ${human(r.objects)} · Arrays: ${human(r.arrays)} · Values: ${human(r.values)}`}).catch(()=>{});return true;}catch(e){setStatus('input-status','Invalid JSON or unable to load: '+e.message,true);tree.textContent='Unable to display JSON. Check the input and try again.';return false}finally{button.disabled=false;button.textContent='Format JSON'}}
+$('format').onclick=format;
+function span(cls,text){const e=document.createElement('span');e.className=cls;e.textContent=text;return e}
+function appendNode(container,path,key,inf,depth=0){const t=inf.type,n=inf.count,complex=isComplex(t),node={path,key,info:inf,open:false,container:null,children:null};treeNodes.set(pathKey(path),node);const row=document.createElement('div');row.className='tree-line';node.container=row;const toggle=document.createElement('button');toggle.className=complex?'arrow':'arrow';toggle.textContent=complex&&n?'▶':'';toggle.disabled=!complex||!n;row.append(toggle);if(key!==null){row.append(span('key',JSON.stringify(String(key))),span('punct',': '))}if(complex){row.append(span('punct',t==='array'?'[':'{'),span('count',`${human(n)} ${t==='array'?'items':'keys'}`));node.end=span('punct',t==='array'?']':'}');row.append(node.end);const child=document.createElement('div');child.className='tree-children';child.hidden=true;node.children=child;toggle.onclick=()=>toggleNode(node);node.toggle=toggle;container.append(row,child)}else{row.append(span(t,t==='string'?JSON.stringify(inf.value):String(inf.value)));container.append(row)}return node}
+async function initTree(){
+  treeNodes.clear();
+  tree.replaceChildren();
+  const rootNode=appendNode(tree,[],null,rootInfo);
+  if(!rootNode.children || !rootInfo.count)return;
+  // Always show top-level keys on first format, including large files.
+  await toggleNode(rootNode,true);
+  // Restore the original fully-expanded reading experience for manageable JSON.
+  // Bound the *entire* automatic render, not individual arrays: even a 32-item
+  // array (or a larger one) should open if its complete subtree is affordable.
+  // Large payloads retain lazy expansion and bounded DOM rendering.
+  if(bytes>1024*1024)return;
+  const MAX_AUTO_NODES=5000;
+  const MAX_AUTO_DEPTH=32;
+  let rendered=1+Math.min(rootInfo.count,CHUNK);
+  const queue=[...treeNodes.values()].filter(n=>n.path.length===1 && n.children && n.info.count);
+  for(let i=0;i<queue.length;i++){
+    const node=queue[i];
+    if(node.open || !node.children || !node.info.count || node.path.length>=MAX_AUTO_DEPTH)continue;
+    // Budget accounts for the direct children before expanding. Arrays over
+    // CHUNK are expanded and paginated, and only their first page is auto-opened.
+    const next=Math.min(node.info.count,CHUNK);
+    if(rendered+next>MAX_AUTO_NODES)break;
+    rendered+=next;
+    await toggleNode(node,true);
+    // Only enqueue direct children of this node, not unrelated tree entries.
+    for(const child of treeNodes.values()){
+      if(child.path.length===node.path.length+1 && child.path.slice(0,-1).every((v,j)=>v===node.path[j]) && child.children && child.info.count){
+        queue.push(child);
+      }
+    }
+  }
+}
+async function toggleNode(node,force,offset=0){if(!node.children)return;const open=force===undefined?!node.open:force;if(!open){node.open=false;node.children.hidden=true;node.toggle.textContent='▶';return}node.open=true;node.children.hidden=false;node.toggle.textContent='▼';if(node.loadedOffset===offset)return;await loadChildren(node,offset)}
+async function loadChildren(node,offset=0){node.children.replaceChildren(span('info','Loading section…'));try{const {entries}=await send('children',{path:node.path,offset,limit:CHUNK});if(!node.open)return;node.children.replaceChildren();node.loadedOffset=offset;const frag=document.createDocumentFragment();for(const e of entries)appendNode(frag,node.path.concat(e.key),e.key,e);node.children.append(frag);if(offset+entries.length<node.info.count){const b=document.createElement('button');b.className='more';b.textContent=`Load next ${human(Math.min(CHUNK,node.info.count-offset-entries.length))} · ${human(offset+entries.length)} / ${human(node.info.count)}`;b.onclick=()=>loadChildren(node,offset+entries.length);node.children.append(b)}if(offset>0){const b=document.createElement('button');b.className='more';b.textContent=`← Previous ${CHUNK} items`;b.onclick=()=>loadChildren(node,Math.max(0,offset-CHUNK));node.children.prepend(b)}}catch(e){node.children.textContent='Unable to load children: '+e.message}}
+$('collapse').onclick=()=>{for(const node of treeNodes.values())if(node.open){node.open=false;node.children.hidden=true;node.toggle.textContent='▶'}};
+$('expand').onclick=async()=>{if(!ready)return;const nodes=[...treeNodes.values()].filter(n=>n.children&&n.info.count&&!n.open).slice(0,5);for(const n of nodes)await toggleNode(n,true);setStatus('output-status','Expanded up to 5 visible sections. More nodes load only when opened to protect performance.')};
+function navigateHit(dir){if(!searchResults.length)return;activeHit=(activeHit+dir+searchResults.length)%searchResults.length;const h=searchResults[activeHit];$(tableMode?'table-match-count':'match-count').textContent=`${human(activeHit+1)} / ${human(searchResults.length)}${searchLimited?'+' :''}`;if(tableMode)showTableHit(h);else revealHit(h)}
+let searchLimited=false;
+async function revealHit(hit){const p=hit.path;let parent=treeNodes.get('[]');if(!parent)return;for(let i=0;i<p.length;i++){const k=p[i];if(!parent.children)break;const offset=typeof k==='number'?Math.floor(k/CHUNK)*CHUNK:0;await toggleNode(parent,true,offset);let child=treeNodes.get(pathKey(p.slice(0,i+1)));if(!child&&typeof k==='string'){// Object with more than CHUNK keys: find key position in worker using bounded paging
+ for(let o=CHUNK;o<parent.info.count;o+=CHUNK){await loadChildren(parent,o);child=treeNodes.get(pathKey(p.slice(0,i+1)));if(child)break}}
+ if(!child)break;parent=child}document.querySelectorAll('.tree-line.active').forEach(e=>e.classList.remove('active'));parent.container.classList.add('active');parent.container.scrollIntoView({block:'center',inline:'nearest'});}
+async function runSearch(mode){const inputEl=$(mode==='table'?'table-search':'search'),q=inputEl.value.trim();searchMode=mode;worker.postMessage({op:'cancelSearch',id:++requestNo});searchResults=[];activeHit=-1;searchLimited=false;const counter=$(mode==='table'?'table-match-count':'match-count');if(!q){counter.textContent='0 matches';$('table-matches').style.display='none';return}counter.textContent='Searching…';try{const req=send('search',{query:q});searchSequence=requestNo;const r=await req;if((mode==='table'?'table-search':'search')&&$(mode==='table'?'table-search':'search').value.trim()!==q)return;searchResults=r.matches;searchLimited=r.limited;counter.textContent=`${human(searchResults.length)}${searchLimited?'+':''} matches`;if(mode==='table')fillTableHits();if(searchResults.length)navigateHit(1)}catch(e){counter.textContent=e.message}}
+function debounceSearch(mode){clearTimeout(searchTimer);searchTimer=setTimeout(()=>runSearch(mode),250)}
+$('search').oninput=()=>debounceSearch('tree');$('table-search').oninput=()=>debounceSearch('table');
+$('prev').onclick=()=>navigateHit(-1);$('next').onclick=()=>navigateHit(1);$('table-prev').onclick=()=>navigateHit(-1);$('table-next').onclick=()=>navigateHit(1);
+$('search').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();navigateHit(e.shiftKey?-1:1)}};$('table-search').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();navigateHit(e.shiftKey?-1:1)}};
+$('clear-search').onclick=()=>{$('search').value='';runSearch('tree')};$('table-clear').onclick=()=>{$('table-search').value='';runSearch('table')};
+function saveBlob(data,name){const a=document.createElement('a');const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000)}
+async function exportJSON(action,minify=false){if(!ready){if(!(await format()))return}try{setStatus('output-status','Preparing JSON '+action+' in the background…');const r=await send('export',{action,minify});if(action==='copy'){await navigator.clipboard.writeText(r.data);setStatus('output-status','JSON copied to clipboard.')}else if(action==='download')saveBlob(r.data,'formatted.json');else if(action==='minify'){if(r.data.length>LARGE_INPUT){saveBlob(r.data,'minified.json');setStatus('input-status','Large minified JSON downloaded instead of loading it into the text editor.')}else{loadFile=null;input.readOnly=false;input.value=r.data;reset();setStatus('input-status','Minified JSON ready. Select Format JSON to view it.') }}else setStatus('output-status','Export ready.')}catch(e){setStatus('output-status','Unable to '+action+': '+e.message,true)}}
+$('copy').onclick=()=>exportJSON('copy');$('download').onclick=()=>exportJSON('download');$('minify').onclick=()=>exportJSON('minify',true);
+$('clear').onclick=()=>{reset(true);$('search').value='';$('table-search').value='';$('table-modal').hidden=true};
+$('sample').onclick=()=>{reset(true);input.value=JSON.stringify({summary:{total:250,success:245,failed:5},employees:[{id:1,name:'John',team:'IT',tags:['admin','dev']},{id:2,name:'Sarah',team:'HR',tags:['people']}],groups:{alpha:[{id:11,value:20},{id:12,value:30}],beta:[]}},null,2);$('input-size').textContent=sz(new Blob([input.value]).size)};
+$('paste').onclick=async()=>{try{const t=await navigator.clipboard.readText();reset(true);input.value=t;$('input-size').textContent=sz(new Blob([t]).size)}catch(e){setStatus('input-status','Clipboard access blocked. Use Ctrl/⌘ + V.',true)}};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();format()}if(e.key==='Escape'&&!$('table-modal').hidden)closeTable()});
+// Table view: restored stacked, nested accordion sections with lazy pages (100 rows maximum per card).
+const navMap=new Map();let tableGeneration=0;
+function closeTable(){$('table-modal').hidden=true;tableMode=false}$('table-close').onclick=closeTable;
+const tablePath=p=>'$'+p.map(k=>typeof k==='number'?'['+k+']':/^[A-Za-z_$][\w$]*$/.test(k)?'.'+k:'['+JSON.stringify(k)+']').join('');
+$('table-view').onclick=async()=>{if(!ready)return;tableMode=true;$('table-modal').hidden=false;$('table-nav').replaceChildren();navMap.clear();const root=await addNav([],null,'Root',rootInfo);await toggleNav(root,true)};
+async function addNav(path,parent,label,inf){const k=pathKey(path);if(navMap.has(k))return navMap.get(k);
+ const card=document.createElement('section');card.className='section-card';const head=document.createElement('div');head.className='section-header';
+ const arrow=document.createElement('button');arrow.className='section-arrow';arrow.textContent='▸';arrow.setAttribute('aria-label','Expand '+label);
+ const name=span('section-label',label),pth=span('section-path',tablePath(path));
+ const count=span('section-count',`${human(inf.count)} ${inf.type==='array'?'items':inf.type==='object'?'keys':'value'}`);
+ head.append(arrow,name,pth,count);card.append(head);
+ const body=document.createElement('div');body.className='section-body';body.hidden=true;
+ const tableWrap=document.createElement('div');tableWrap.className='section-table-wrap';
+ const footer=document.createElement('div');footer.className='section-pagination';const pageLabel=span('notice','');const buttons=document.createElement('div');buttons.className='tools';
+ const prev=document.createElement('button'),next=document.createElement('button');prev.textContent='← Previous 100';next.textContent='Next 100 →';buttons.append(prev,next);footer.append(pageLabel,buttons);
+ const children=document.createElement('div');children.className='section-children';body.append(tableWrap,footer,children);card.append(body);
+ (parent?parent.children:$('table-nav')).append(card);
+ const node={path,info:inf,card,head,arrow,children,body,tableWrap,footer,pageLabel,prev,next,loaded:false,open:false,offset:0,total:0,generation:0};navMap.set(k,node);
+ head.onclick=()=>toggleNav(node);prev.onclick=()=>loadTable(node,Math.max(0,node.offset-TABLE_PAGE));next.onclick=()=>loadTable(node,Math.min(Math.floor(Math.max(0,node.total-1)/TABLE_PAGE)*TABLE_PAGE,node.offset+TABLE_PAGE));
+ return node}
+async function loadNavBatch(node,offset=0){try{const r=await send('sections',{path:node.path,offset});if(!node.open)return;
+ if(offset===0)node.children.replaceChildren();for(const en of r.sections)await addNav(node.path.concat(en.key),node,String(en.key),en);
+ if(r.nextOffset<r.total){const b=document.createElement('button');b.className='more';b.textContent=`Load more nested sections (${human(r.nextOffset)} / ${human(r.total)} keys checked)`;b.onclick=()=>{b.remove();loadNavBatch(node,r.nextOffset)};node.children.append(b)}
+ }catch(e){node.children.textContent='Unable to load nested sections: '+e.message}}
+async function toggleNav(node,force){const open=force===undefined?!node.open:force;if(open===node.open)return;
+ node.open=open;node.body.hidden=!open;node.arrow.textContent=open?'▾':'▸';
+ if(open&&!node.loaded){node.loaded=true;await Promise.all([loadTable(node,0),node.info.type==='object'?loadNavBatch(node):Promise.resolve()])}}
+async function loadTable(node,offset=0,focusIndex=null){const generation=++node.generation;node.offset=offset;node.tableWrap.textContent='Loading table…';
+ try{const {page}=await send('tablePage',{path:node.path,offset,size:TABLE_PAGE});if(generation!==node.generation||!node.open)return;
+ node.total=page.count;node.tableWrap.replaceChildren();const t=document.createElement('table');t.className='json-table';const tHead=document.createElement('thead'),trHead=document.createElement('tr');
+ for(const col of page.cols){const th=document.createElement('th');th.textContent=col;trHead.append(th)}tHead.append(trHead);t.append(tHead);
+ const tbody=document.createElement('tbody');for(const row of page.rows){const tr=document.createElement('tr');if(row.index===focusIndex)tr.className='focus';for(let j=0;j<row.cells.length;j++){
+ const td=document.createElement('td');td.textContent=row.cells[j];let child=null;
+ if(page.cols[0]==='Property'&&j===1&&row.isComplex)child=node.path.concat(row.key);
+ else if(page.cols[0]==='#'&&j===1&&page.cols.length===2&&row.isComplex)child=node.path.concat(row.index);
+ else if(page.cols[0]==='#'&&j>0&&row.complexFields&&row.complexFields.some(f=>f.key===page.cols[j]))child=node.path.concat(row.index,page.cols[j]);
+ if(child){td.classList.add('cell-link');td.title='Open nested table';td.onclick=()=>inspectPath(child)}tr.append(td)}tbody.append(tr)}t.append(tbody);node.tableWrap.append(t);
+ const start=page.count?offset+1:0;node.pageLabel.textContent=`Rows ${human(start)}–${human(Math.min(page.count,offset+TABLE_PAGE))} of ${human(page.count)}`;node.prev.disabled=offset===0;node.next.disabled=offset+TABLE_PAGE>=page.count;
+ node.footer.hidden=page.count<=TABLE_PAGE;
+ if(focusIndex!==null){const trFocus=node.tableWrap.querySelector('tr.focus');if(trFocus)trFocus.scrollIntoView({block:'center'})}
+ }catch(e){node.tableWrap.textContent=e.message}}
+async function inspectPath(path,offset=0,focusIndex=null){let prefix=[];for(const k of path){let parent=navMap.get(pathKey(prefix));if(parent){await toggleNav(parent,true);const childPath=prefix.concat(k);if(!navMap.has(pathKey(childPath))){const {info}=await send('node',{path:childPath});await addNav(childPath,parent,String(k),info)}}prefix=prefix.concat(k)}
+ let node=navMap.get(pathKey(path));if(!node){const {info}=await send('node',{path});node=await addNav(path,navMap.get(pathKey(path.slice(0,-1))),String(path.at(-1)),info)}
+ await toggleNav(node,true);if(offset||focusIndex!==null)await loadTable(node,offset,focusIndex);node.card.scrollIntoView({block:'center',behavior:'smooth'});node.card.classList.add('section-highlight');setTimeout(()=>node.card.classList.remove('section-highlight'),1500)}
+function fillTableHits(){const list=$('table-matches');list.replaceChildren();list.style.display=searchResults.length?'block':'none';for(let i=0;i<Math.min(30,searchResults.length);i++){const r=searchResults[i],b=document.createElement('button');b.className='match-item';b.textContent=r.display+' — '+r.preview;b.onclick=()=>{activeHit=i-1;navigateHit(1)};list.append(b)}}
+async function showTableHit(hit){const path=hit.path;const index=path.findIndex(k=>typeof k==='number');if(index>=0){const parent=path.slice(0,index),record=path[index];await inspectPath(parent,Math.floor(record/TABLE_PAGE)*TABLE_PAGE,record)}else if(path.length){await inspectPath(path.slice(0,-1))}else await inspectPath([]);
+ const list=$('table-matches');list.querySelectorAll('.match-item').forEach((el,i)=>el.classList.toggle('current',i===activeHit))}
+</script></body></html>
